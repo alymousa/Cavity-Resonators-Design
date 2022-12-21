@@ -1,0 +1,94 @@
+permitivity_air = 8.85/1000000000000;
+permeability_air = 4*pi/10000000;
+c = 300000000;
+
+prompt1 = 'What is the value of the height of the Resonator?';
+prompt2 = 'What is the value of the width of the Resonator?';
+prompt3 = 'What is the value of the length of Resonator?';
+
+b = input(prompt1);
+a = input(prompt2);
+d = input(prompt3);
+
+if a<b
+    prompt = 'The dimensions donot match the condition enter a new value for for the dimensions starting with the height';
+    b = input(prompt);
+    a = input(prompt2);
+    d = input(prompt3);
+end
+
+if a>d
+    prompt = 'The dimensions donot match the condition enter a new value for for the dimensions starting with the height';
+    b = input(prompt);
+    a = input(prompt2);
+    d = input(prompt3);
+end
+
+metal_conductivity = input('What is the conductivity of the Waveguide metal?');
+relative_permitivity = input('What is the relative permitivity of the filling materil?');
+loss_tangent = input('What is the loss tangent of the filling material?');
+
+% since b<a<d 1st resonance = TE101 , 2nd resonance either TE102 or TE011 %
+f101 = (c/(2*pi*sqrt(relative_permitivity*1)))*sqrt(((pi/a)^2)+((pi/d)^2));
+f102 = (c/(2*pi*sqrt(relative_permitivity*1)))*sqrt(((pi/a)^2)+((2*pi/d)^2));
+f011 = (c/(2*pi*sqrt(relative_permitivity*1)))*sqrt(((pi/b)^2)+((pi/d)^2));
+
+
+w1 = 2*pi*f101;
+w2 = 2*pi*f102;
+w3 = 2*pi*f011;
+
+
+We101 = (a*b*d*relative_permitivity*permitivity_air/16)*(2*a*permeability_air*w1/pi)^2;
+We102 = (a*b*d*relative_permitivity*permitivity_air/16)*(2*a*permeability_air*w2/pi)^2;
+We011 = (a*b*d*relative_permitivity*permitivity_air/4)*(b*permeability_air*w3/pi)^2;
+
+Rs101 = sqrt(pi*f101*permeability_air/metal_conductivity);
+Rs102 = sqrt(pi*f102*permeability_air/metal_conductivity);
+Rs011 = sqrt(pi*f011*permeability_air/metal_conductivity);
+
+PL101 = Rs101*((a*d)+(2*b*d)+(a^3/d)+((2*b*a^3)/d^2));
+PL102 = Rs102*((a*d)+(2*b*d)+(4*a^3/d)+((8*b*a^3)/d^2));
+PL011 = Rs011*((b*d)+(2*a*d)+(b^3/d)+((2*a*b^3)/d^2));
+
+Qd = 1/loss_tangent;
+
+Qc101 = 2*w1*We101/PL101;
+Qc102 = 2*w2*We102/PL102;
+Qc011 = 2*w3*We011/PL011;
+
+BW101 = 1/Qc101 + 1/Qd;
+Q101 = 1/BW101;
+
+BW102 = 1/Qc102 + 1/Qd;
+Q102 = 1/BW102;
+
+BW011 = 1/Qc011 + 1/Qd;
+Q011 = 1/BW011;
+
+fres1 = f101;
+Qres1 = Q101;
+BWres1 = BW101;
+
+if f102<f011
+    fres2 = f102;
+    Qres2 = Q102;
+    BWres2 = BW102;
+else 
+    fres2 = f011;
+    Qres2 = Q011;
+    BWres2 = BW011;
+end
+
+disp('The First Resonance Frequency is ');
+disp(fres1);
+disp('The Quality factor of the first resonance is ')
+disp(Qres1);
+disp('The Bandwidth of the first resonance is ')
+disp(BWres1);
+disp('The Second Resonance Frequency is ');
+disp(fres2);
+disp('The Quality factor of the second resonance is ')
+disp(Qres2);
+disp('The Bandwidth of the second resonance is ')
+disp(BWres2);
